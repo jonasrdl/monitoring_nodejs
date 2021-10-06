@@ -9,6 +9,12 @@
      },
      {
        "how": "influx"
+     },
+     {
+       "how": "webhook",
+       "vars": {
+         "endpoint": "http://127.0.0.1:8000/"
+       }
      }
    ],
    "check_commands":[

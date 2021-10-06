@@ -41,9 +41,11 @@ module.exports.thread = function(callback){
 module.exports.init_vars = function(){
   index.email = 0;
   index.influx = 0;
+  index.webhook = 0;
 
   queue.email = [];
   queue.influx = [];
+  queue.webhook = [];
 }
 
 module.exports.add_email = function(mail_object){
@@ -52,4 +54,8 @@ module.exports.add_email = function(mail_object){
 
 module.exports.add_influx = function(influx_object){
   queue.influx.push(influx_object);
+}
+
+module.exports.add_webhook = function(webhook_object){
+  queue.webhook.push(webhook_object);
 }
