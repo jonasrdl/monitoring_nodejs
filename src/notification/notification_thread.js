@@ -1,5 +1,6 @@
 const send_notification_email = require('./send_notification_email.js');
 const send_notification_influxdb = require('./send_notification_influxdb.js');
+const send_notification_webhook = require('./send_notification_webhook.js');
 
 var queue = {};
 var index = {};
@@ -7,7 +8,9 @@ var index = {};
 module.exports.thread = function(callback){
   var loop = function(){
     if(queue.influx.length>index.influx || queue.email.length>index.email){
-      var current_email = queue.email[index.email];
+      let current_email = queue.email[index.email];
+      let current_influx = queue.influx[index.influx];
+      let current_webhook = queue.webhook[index.webhook];
 
       if(current_email){
         send_notification_email(current_email.config, current_email.notify, current_email.host, current_email.check_command, current_email.state, current_email.message, ()=>{
@@ -16,19 +19,22 @@ module.exports.thread = function(callback){
 
           loop();
         });
-      }else{
-        var current_influx = queue.influx[index.influx];
+      }else if(current_influx){
+        send_notification_influxdb(current_influx.config, current_influx.notify, current_influx.host, current_influx.check_command, current_influx.state, current_influx.message, current_influx.stdout, ()=>{
+          queue.influx[index.influx] = undefined;
+          index.influx++;
 
-        if(current_influx){
-          send_notification_influxdb(current_influx.config, current_influx.notify, current_influx.host, current_influx.check_command, current_influx.state, current_influx.message, current_influx.stdout, ()=>{
-            queue.influx[index.influx] = undefined;
-            index.influx++;
-
-            loop();
-          });
-        }else{
           loop();
-        }
+        });
+      }else if(current_webhook){
+        send_notification_webhook(current_webhook.config, current_webhook.notify, current_webhook.host, current_webhook.check_command, current_webhook.state, current_webhook.message, ()=>{
+          queue.webhook[index.webhook] = undefined;
+          index.webhook++;
+
+          loop();
+        })
+      }else{
+        loop();
       }
     }else{
       callback();
