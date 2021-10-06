@@ -1,3 +1,5 @@
+const axios = require('axios');
+
 const webhook_messages = {};
 
 module.exports = function (config, notify, host, check_command, state, message, callback){
