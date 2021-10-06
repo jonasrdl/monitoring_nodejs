@@ -54,7 +54,7 @@ function execute_webhook(config, notify, host, check_command, type, state, messa
   axios.post(notify.vars.endpoint, { data: { subject: subject, text: text, type: type, state: state, message: message, timestamps: timestamps, hostname: host.name, command_name: check_command.unique_name}}).then( data => {
     console.log(data.data);
   }).catch(error => {
-    console.log(error.response);
+    console.log(error.message);
   });
 
   callback();
