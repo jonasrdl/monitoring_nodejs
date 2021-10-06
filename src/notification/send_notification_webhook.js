@@ -1,6 +1,8 @@
 const webhook_messages = {};
 
 module.exports = function (config, notify, host, check_command, state, message, callback){
+  console.log("Checking messages");
+
   //REOCCURRING
   if(webhook_messages[host.name]){
     if(webhook_messages[host.name][check_command.unique_name]){
@@ -10,7 +12,7 @@ module.exports = function (config, notify, host, check_command, state, message, 
         if(((Date.now() - webhook_messages[host.name][check_command.unique_name].lastNotification) >= 60000*config.reoccurring_error_message_time && state == 'error') || ((Date.now() - webhook_messages[host.name][check_command.unique_name].lastNotification) >= 60000*config.reoccurring_warning_message_time && state == 'warning') || webhook_messages[host.name][check_command.unique_name].lastState !== state){
           webhook_messages[host.name][check_command.unique_name].lastNotification = Date.now();
 
-          send_email(config, notify, host, check_command, 'REOCCURRING', state, message, webhook_messages[host.name][check_command.unique_name], ()=>{
+          execute_webhook(config, notify, host, check_command, 'REOCCURRING', state, message, webhook_messages[host.name][check_command.unique_name], ()=>{
             if(state === 'ok'){
               webhook_messages[host.name][check_command.unique_name] = undefined;
             }else{
@@ -30,15 +32,15 @@ module.exports = function (config, notify, host, check_command, state, message, 
 
   //FIRST
   if(state !== 'ok'){
+    console.log("Not ok");
     webhook_messages[host.name][check_command.unique_name] = {lastState: state, firstOccurring: Date.now(), lastOccurring: Date.now(), lastNotification: Date.now()};
 
     execute_webhook(config, notify, host, check_command, 'NEW', state, message, webhook_messages[host.name][check_command.unique_name], callback);
   }else{
+    console.log("Callback");
     callback();
   }
 }
-
-var transporter = undefined;
 
 function execute_webhook(config, notify, host, check_command, type, state, message, timestamps, callback){
   console.log('Execute webhook');
