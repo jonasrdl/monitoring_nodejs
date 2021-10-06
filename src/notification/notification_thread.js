@@ -7,7 +7,7 @@ var index = {};
 
 module.exports.thread = function(callback){
   var loop = function(){
-    if(queue.influx.length>index.influx || queue.email.length>index.email || queue.webhook_object.length>index.webhook){
+    if(queue.influx.length>index.influx || queue.email.length>index.email || queue.webhook.length>index.webhook){
       let current_email = queue.email[index.email];
       let current_influx = queue.influx[index.influx];
       let current_webhook = queue.webhook[index.webhook];
