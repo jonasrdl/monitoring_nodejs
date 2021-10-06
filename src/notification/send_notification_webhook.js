@@ -41,6 +41,8 @@ module.exports = function (config, notify, host, check_command, state, message, 
 var transporter = undefined;
 
 function execute_webhook(config, notify, host, check_command, type, state, message, timestamps, callback){
+  console.log('Execute webhook');
+
   var timestampText = 'First occurred: ' + timeConverter(timestamps.firstOccurring) + '\n Last occurred: ' + timeConverter(timestamps.lastOccurring);
   var subject = '[' + type + '] ' + state + ' while checking command ' + check_command.command_name;
   var text = '';
