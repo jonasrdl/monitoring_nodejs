@@ -3,8 +3,6 @@ const axios = require('axios');
 const webhook_messages = {};
 
 module.exports = function (config, notify, host, check_command, state, message, callback){
-  console.log("Checking messages");
-
   //REOCCURRING
   if(webhook_messages[host.name]){
     if(webhook_messages[host.name][check_command.unique_name]){
@@ -34,19 +32,15 @@ module.exports = function (config, notify, host, check_command, state, message, 
 
   //FIRST
   if(state !== 'ok'){
-    console.log("Not ok");
     webhook_messages[host.name][check_command.unique_name] = {lastState: state, firstOccurring: Date.now(), lastOccurring: Date.now(), lastNotification: Date.now()};
 
     execute_webhook(config, notify, host, check_command, 'NEW', state, message, webhook_messages[host.name][check_command.unique_name], callback);
   }else{
-    console.log("Callback");
     callback();
   }
 }
 
 function execute_webhook(config, notify, host, check_command, type, state, message, timestamps, callback){
-  console.log('Execute webhook');
-
   var timestampText = 'First occurred: ' + timeConverter(timestamps.firstOccurring) + '\n Last occurred: ' + timeConverter(timestamps.lastOccurring);
   var subject = '[' + type + '] ' + state + ' while checking command ' + check_command.command_name;
   var text = '';
@@ -58,9 +52,9 @@ function execute_webhook(config, notify, host, check_command, type, state, messa
   }
 
   axios.post(notify.vars.endpoint, { data: { subject: subject, text: text, type: type, state: state, message: message, timestamps: timestamps, hostname: host.name, command_name: check_command.unique_name}}).then( data => {
-    console.log(data);
+    console.log(data.data);
   }).catch(error => {
-    console.log(error);
+    console.log(error.response);
   });
 
   callback();

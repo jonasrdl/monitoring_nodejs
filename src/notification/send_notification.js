@@ -8,7 +8,6 @@ module.exports = function (notification_thread, config, host, check_command, sta
         notification_thread.add_influx({config, notify, host, check_command, state, message, stdout});
         break;
       case 'webhook':
-        console.log('New webhook');
         notification_thread.add_webhook({config, notify, host, check_command, state, message, stdout});
         break;
 
