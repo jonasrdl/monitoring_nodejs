@@ -4,5 +4,5 @@
    ],
    "command":"cat /sys/class/thermal/thermal_zone0/temp",
    "warning_on": "out_larger_than_value",
-   "warning_value": 75000,
+   "warning_value": 75000
 }
