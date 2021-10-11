@@ -2,7 +2,7 @@
    "name":"check_cpu_temp",
    "required_vars":[
    ],
-   "command":"TEMP=$(cat /sys/class/thermal/thermal_zone0/temp); echo $(($TEMP/1000))",
+   "command":"cat /sys/class/thermal/thermal_zone0/temp",
    "warning_on": "out_larger_than_value",
-   "warning_value": 75,
+   "warning_value": 75000,
 }
