@@ -1,5 +1,7 @@
 const { exec } = require("child_process");
 
+let loop_count = 0;
+
 module.exports = function (config, host, commands, notification_callback, callback){
   var i = 0;
 
@@ -10,63 +12,69 @@ module.exports = function (config, host, commands, notification_callback, callba
       if(!commands[check_command.command_name]){
         console.log('Could not find command: ' + check_command.command_name);
       }else{
-        console.log('Running command: ' + check_command.command_name);
+        if(!check_command.every || loop_count % check_command.every === 0){
+          console.log('Running command: ' + check_command.command_name);
 
-        var command = commands[check_command.command_name];
+          var command = commands[check_command.command_name];
 
-        command = parse_base64_command(command);
+          command = parse_base64_command(command);
 
-        command = parse_required_vars_command(command, check_command);
+          command = parse_required_vars_command(command, check_command);
 
-        if(!command){
-          console.log('Not enough vars for command!');
-
-          i++;
-          loop();
-        }else{
-          exec_command(command.command, config.command_delay, config.validate_error, config.command_timeout, (result) => {
-            var error_or_warning = {};
-
-            if(result.error){
-              error_or_warning = { state: 'error', message: 'error:\n\n' + result.error + '\nstdout:\n\n' + result.stdout};
-            }else if(result.stderr){
-              error_or_warning = { state: 'error', message: 'stderr:\n\n' + result.stderr + '\nstdout:\n\n' + result.stdout};
-            }else{
-              error_or_warning = check_for_method(result.error, result.stderr, result.stdout, 'error', command.failure_on, command.failure_value);
-
-              if(!error_or_warning){
-                error_or_warning = check_for_method(result.error, result.stderr, result.stdout, 'warning', command.warning_on, command.warning_value);
-              }
-
-              if(!error_or_warning){
-                  //COMMAND IS STATE OK
-                  error_or_warning = { state: 'ok', message: 'stdout:\n\n' + result.stdout};
-              }
-            }
-
-            var debug_command_callback = function(){
-              if(command.multiple_lines_multiple_notifications){
-                //send a notification for every line of stdout
-                parse_multiline_stdout(host, check_command, result.stdout, error_or_warning, notification_callback);
-              }else{
-                notification_callback(host, check_command, error_or_warning.state, error_or_warning.message, result.stdout);
-              }
-            }
-
-            if(command.debug_command){
-              exec_command(command.debug_command, 0, 1, config.command_timeout, (debug_result)=>{
-                error_or_warning.message += '\n\nDebug information:\n\n' + 'stdout:\n\n' +  debug_result.stdout + '\nstderr:\n\n' + debug_result.stderr + '\n';
-
-                debug_command_callback();
-              });
-            }else{
-              debug_command_callback();
-            }
+          if(!command){
+            console.log('Not enough vars for command!');
 
             i++;
+            loop_count++;
             loop();
+          }else{
+            exec_command(command.command, config.command_delay, config.validate_error, config.command_timeout, (result) => {
+              var error_or_warning = {};
 
-          });
+              if(result.error){
+                error_or_warning = { state: 'error', message: 'error:\n\n' + result.error + '\nstdout:\n\n' + result.stdout};
+              }else if(result.stderr){
+                error_or_warning = { state: 'error', message: 'stderr:\n\n' + result.stderr + '\nstdout:\n\n' + result.stdout};
+              }else{
+                error_or_warning = check_for_method(result.error, result.stderr, result.stdout, 'error', command.failure_on, command.failure_value);
+
+                if(!error_or_warning){
+                  error_or_warning = check_for_method(result.error, result.stderr, result.stdout, 'warning', command.warning_on, command.warning_value);
+                }
+
+                if(!error_or_warning){
+                    //COMMAND IS STATE OK
+                    error_or_warning = { state: 'ok', message: 'stdout:\n\n' + result.stdout};
+                }
+              }
+
+              var debug_command_callback = function(){
+                if(command.multiple_lines_multiple_notifications){
+                  //send a notification for every line of stdout
+                  parse_multiline_stdout(host, check_command, result.stdout, error_or_warning, notification_callback);
+                }else{
+                  notification_callback(host, check_command, error_or_warning.state, error_or_warning.message, result.stdout);
+                }
+              }
+
+              if(command.debug_command){
+                exec_command(command.debug_command, 0, 1, config.command_timeout, (debug_result)=>{
+                  error_or_warning.message += '\n\nDebug information:\n\n' + 'stdout:\n\n' +  debug_result.stdout + '\nstderr:\n\n' + debug_result.stderr + '\n';
+
+                  debug_command_callback();
+                });
+              }else{
+                debug_command_callback();
+              }
+
+              i++;
+              loop_count++;
+              loop();
+
+            });
+          }
+        }else{
+          console.log('Skipping command: ' + check_command.command_name);
         }
       }
     }else{
