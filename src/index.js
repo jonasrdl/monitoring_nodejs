@@ -32,7 +32,7 @@ if(validate_config()){
     var hosts_map = new Map();
 
     fs.readdir(host_dir, (err, files) => {
-      files.filter((el => path.extname(el) === '.json')).forEach(file => {
+      files.filter(file => { return path.extname(file).toLowerCase() === '.json' }).forEach(file => {
         var host = JSON.parse(fs.readFileSync());
 
         if(validate_host(host)){
