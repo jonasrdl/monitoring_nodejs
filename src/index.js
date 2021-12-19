@@ -33,7 +33,7 @@ if(validate_config()){
 
     fs.readdir(host_dir, (err, files) => {
       files.filter(file => { return path.extname(file).toLowerCase() === '.json' }).forEach(file => {
-        var host = JSON.parse(fs.readFileSync());
+        var host = JSON.parse(fs.readFileSync(file));
 
         if(validate_host(host)){
           host.check_commands.forEach((command, i) => {
