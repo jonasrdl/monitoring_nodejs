@@ -20,7 +20,7 @@ if(validate_config()){
   fs.readdir(command_dir, (err, files) => {
     var commands = {};
 
-    files.forEach(file => {
+    files.filter(file => { return path.extname(file).toLowerCase() === '.json' }).foeEach(file => {
       var command = JSON.parse(fs.readFileSync(command_dir + '/' + file));
 
       commands[command.name] = command;
