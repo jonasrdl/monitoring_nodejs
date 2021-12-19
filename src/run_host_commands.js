@@ -1,8 +1,10 @@
 const { exec } = require("child_process");
 
-let loop_count = 0;
+let run_count = 0;
 
 module.exports = function (config, host, commands, notification_callback, callback){
+  run_count++;
+  
   var i = 0;
 
   var loop = function(){
@@ -22,10 +24,9 @@ module.exports = function (config, host, commands, notification_callback, callba
           console.log('Not enough vars for command!');
 
           i++;
-          loop_count++;
           loop();
         }else{
-          if(!command.every || loop_count % command.every === 0){
+          if(!command.every || run_count % command.every === 0){
             console.log('Running command: ' + check_command.command_name);
 
             exec_command(command.command, config.command_delay, config.validate_error, config.command_timeout, (result) => {
@@ -68,7 +69,6 @@ module.exports = function (config, host, commands, notification_callback, callba
               }
 
               i++;
-              loop_count++;
               loop();
 
             });
@@ -76,7 +76,6 @@ module.exports = function (config, host, commands, notification_callback, callba
             console.log('Skipping command: ' + check_command.command_name);
 
             i++;
-            loop_count++;
             loop();
           }
         }
