@@ -56,7 +56,7 @@ run ```npm start```
 
 Every host must have a unique ```name```, a ```notify``` array and a ```check_commands``` array.  
 
-The ```notify``` array contains methods on how to notify the user. Every object in the array must have a ```how``` (currently ```email```, ```influx``` or ```webhook```) and optionally an extra ```vars``` array.   
+The ```notify``` array contains methods on how to notify the user. Every object in the array must have a ```how``` (currently ```email```, ```influx``` or ```webhook```) and optionally an extra ```vars``` object.   
 ```email``` and ```webhook``` will be called only on errors and warnings whereas everything will be saved in ```influx```.   
 A ```post``` request will be sent to the ```webhook``` ```endpoint``` including the message in the body.   
 

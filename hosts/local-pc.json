@@ -1,5 +1,6 @@
 {
-   "name":"PC",
+   "name":"Local-PC",
+   "remote": false,
    "notify": [
      {
        "how": "email",

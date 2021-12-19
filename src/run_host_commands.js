@@ -2,9 +2,9 @@ const { exec } = require("child_process");
 
 let run_count = 0;
 
-module.exports = function (config, host, commands, notification_callback, callback){
+module.exports = function (config, host, commands, notification_callback, callback, reconnect_callback){
   run_count++;
-  
+
   var i = 0;
 
   var loop = function(){
@@ -12,7 +12,7 @@ module.exports = function (config, host, commands, notification_callback, callba
       var check_command = host.check_commands[i];
 
       if(!commands[check_command.command_name]){
-        console.log('Could not find command: ' + check_command.command_name);
+        console.log('[' + host.name + ']' + ' Could not find command: ' + check_command.command_name);
       }else{
         var command = commands[check_command.command_name];
 
@@ -21,15 +21,15 @@ module.exports = function (config, host, commands, notification_callback, callba
         command = parse_required_vars_command(command, check_command);
 
         if(!command){
-          console.log('Not enough vars for command!');
+          console.log('[' + host.name + ']' + ' Not enough vars for command!');
 
           i++;
           loop();
         }else{
           if(!command.every || run_count % command.every === 0){
-            console.log('Running command: ' + check_command.command_name);
+            console.log('[' + host.name + ']' + ' Running command: ' + check_command.command_name);
 
-            exec_command(command.command, config.command_delay, config.validate_error, config.command_timeout, (result) => {
+            exec_command(host, command.command, config.command_delay, config.validate_error, config.command_timeout, (result) => {
               var error_or_warning = {};
 
               if(result.error){
@@ -59,11 +59,11 @@ module.exports = function (config, host, commands, notification_callback, callba
               }
 
               if(command.debug_command){
-                exec_command(command.debug_command, 0, 1, config.command_timeout, (debug_result)=>{
+                exec_command(host, command.debug_command, 0, 1, config.command_timeout, (debug_result)=>{
                   error_or_warning.message += '\n\nDebug information:\n\n' + 'stdout:\n\n' +  debug_result.stdout + '\nstderr:\n\n' + debug_result.stderr + '\n';
 
                   debug_command_callback();
-                });
+                }, reconnect_callback);
               }else{
                 debug_command_callback();
               }
@@ -71,9 +71,9 @@ module.exports = function (config, host, commands, notification_callback, callba
               i++;
               loop();
 
-            });
+            }, reconnect_callback);
           }else{
-            console.log('Skipping command: ' + check_command.command_name);
+            console.log('[' + host.name + ']' + ' Skipping command: ' + check_command.command_name);
 
             i++;
             loop();
@@ -142,7 +142,15 @@ function parse_base64_command(command){
   return command;
 }
 
-function exec_command(command, command_delay, runs, timeout, callback){
+function exec_command(host, command, command_delay, runs, timeout, callback, reconnect_callback){
+  if(host.ssh){
+    exec_command_ssh(host, command, command_delay, runs, timeout, callback, reconnect_callback)
+  }else{
+    exec_command_local(command, command_delay, runs, timeout, callback)
+  }
+}
+
+function exec_command_local(command, command_delay, runs, timeout, callback){
   setTimeout(()=>{
     var i = 0;
 
@@ -165,6 +173,48 @@ function exec_command(command, command_delay, runs, timeout, callback){
             //NO MORE error
             callback({error: error, stdout:stdout, stderr:stderr});
           }
+        });
+      }else{
+        //MULTIPLE TRIES FAILED
+        callback({error: lastError, stdout:lastStderr, stderr:lastStdout});
+      }
+    }
+
+    command_callback();
+  }, command_delay*1000);
+}
+
+function exec_command_ssh(host, command, command_delay, runs, timeout, callback, reconnect_callback){
+  setTimeout(()=>{
+    var i = 0;
+
+    var lastError = '';
+    var lastStderr = '';
+    var lastStdout = '';
+
+    var command_callback = function(){
+      if(i < runs){
+        host.ssh.execCommand('timeout ' + timeout + ' ' + command).then((result) => {
+          let error = '';
+          let stderr = result.stderr;
+          let stdout = result.stdout;
+
+          if(error || stderr){
+            i++;
+
+            lastError = error;
+            lastStderr = stderr;
+            lastStdout = stdout;
+
+            command_callback();
+          }else{
+            //NO MORE error
+            callback({error: error, stdout:stdout, stderr:stderr});
+          }
+        }).catch((e) => {
+          console.log(e);
+
+          reconnect_callback(host, e);
         });
       }else{
         //MULTIPLE TRIES FAILED

@@ -1,0 +1,75 @@
+{
+   "name":"Remote-PC",
+   "remote": true,
+   "vars": {
+     "hostname": "remote-pc.example.com",
+     "port": 22,
+     "username": "monitoring_user",
+     "privateKeyPath": "remote-pc-private.id_rsa"
+   },
+   "notify": [
+     {
+       "how": "email",
+       "vars": {
+         "email": "admin@lucaspape.de"
+       }
+     },
+     {
+       "how": "influx"
+     },
+     {
+       "how": "webhook",
+       "vars": {
+         "endpoint": "http://127.0.0.1:8000/"
+       }
+     }
+   ],
+   "check_commands":[
+      {
+         "command_name": "check_http",
+         "vars":{
+            "web_url":"https://lucaspape.de"
+         }
+      },
+      {
+         "command_name":"check_alive_ip4",
+         "vars":{
+            "ip4":"1.1.1.1"
+         }
+      },
+      {
+         "command_name":"check_alive_ip6",
+         "vars":{
+            "ip6":"2606:4700:4700::1111"
+         }
+      },
+      {
+         "command_name":"check_updates_yay"
+      },
+      {
+         "command_name":"check_procs"
+      },
+      {
+         "command_name":"check_alive_systemd",
+         "vars":{
+           "service": "sshd"
+         }
+      },
+      {
+         "command_name":"check_total_cpu_usage"
+      },
+      {
+         "command_name":"check_total_memory_usage"
+      },
+      {
+         "command_name":"check_diskspace_usage",
+         "vars":{
+           "disk": "sda3"
+         }
+      },
+      {
+         "command_name":"check_cpu_usage_per_core",
+         "unique_name":"check_cpu_usage_per_core"
+      }
+   ]
+}
