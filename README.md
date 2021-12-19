@@ -8,7 +8,10 @@ There are hosts and commands to configure, the hosts will use the commands to ch
 
 clone this repo: run ```git clone https://github.com/lucaspape/monitoring_nodejs.git```
 
-run ```npm install```
+run ```npm install```   
+
+To generate configs you can use the setup.js   
+run ```node setup.js```
 
 # how to run
 
