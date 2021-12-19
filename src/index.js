@@ -1,6 +1,7 @@
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const {NodeSSH} = require('node-ssh');
+const path = require('path');
 
 const run_host_commands = require('./run_host_commands.js');
 const send_notification = require('./notification/send_notification.js');
@@ -31,8 +32,8 @@ if(validate_config()){
     var hosts_map = new Map();
 
     fs.readdir(host_dir, (err, files) => {
-      files.forEach(file => {
-        var host = require('./' + host_dir + '/' + file);
+      files.filter((el => path.extname(el) === '.json')).forEach(file => {
+        var host = JSON.parse(fs.readFileSync());
 
         if(validate_host(host)){
           host.check_commands.forEach((command, i) => {
