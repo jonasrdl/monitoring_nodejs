@@ -16,9 +16,20 @@ run ```npm start```
 
 # hosts
 
+This script supports two different types of hosts: local and remote. Set ```remote``` in the host config to ```true``` to connect to it over SSH.   
+If you set ```remote``` to ```true``` you must provide the following ```vars```: ```hostname```, ```username```, ```privateKeyPath```.   
+```privateKeyPath``` must be a filepath and its public key must be added for the correct user on the remote server.   
+Additionally you can provide the ```port``` variable if you are not using the standard port 22.
+
 ```
 {
    "name":"lucaspape.de",
+   "remote": true,
+   "vars": {
+     "hostname": "examplehost.com",
+     "username": "monitoringuser",
+     "privateKeyPath": "/private.key"
+   }
    "notify": [
      {
        "how": "email",
