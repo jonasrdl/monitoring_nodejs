@@ -12,22 +12,22 @@ module.exports = function (config, host, commands, notification_callback, callba
       if(!commands[check_command.command_name]){
         console.log('Could not find command: ' + check_command.command_name);
       }else{
-        if(!check_command.every || loop_count % check_command.every === 0){
-          console.log('Running command: ' + check_command.command_name);
+        var command = commands[check_command.command_name];
 
-          var command = commands[check_command.command_name];
+        command = parse_base64_command(command);
 
-          command = parse_base64_command(command);
+        command = parse_required_vars_command(command, check_command);
 
-          command = parse_required_vars_command(command, check_command);
+        if(!command){
+          console.log('Not enough vars for command!');
 
-          if(!command){
-            console.log('Not enough vars for command!');
+          i++;
+          loop_count++;
+          loop();
+        }else{
+          if(!command.every || loop_count % command.every === 0){
+            console.log('Running command: ' + check_command.command_name);
 
-            i++;
-            loop_count++;
-            loop();
-          }else{
             exec_command(command.command, config.command_delay, config.validate_error, config.command_timeout, (result) => {
               var error_or_warning = {};
 
@@ -72,9 +72,9 @@ module.exports = function (config, host, commands, notification_callback, callba
               loop();
 
             });
+          }else{
+            console.log('Skipping command: ' + check_command.command_name);
           }
-        }else{
-          console.log('Skipping command: ' + check_command.command_name);
         }
       }
     }else{

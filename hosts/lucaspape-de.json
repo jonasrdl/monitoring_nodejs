@@ -37,8 +37,7 @@
          }
       },
       {
-         "command_name":"check_updates_yay",
-         "every": 100
+         "command_name":"check_updates_yay"
       },
       {
          "command_name":"check_procs"

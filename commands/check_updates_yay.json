@@ -4,5 +4,6 @@
    "command":"yay -Qu | wc -l",
    "warning_on": "out_larger_than_value",
    "warning_value": 0,
-   "debug_command": "yay -Qu"
+   "debug_command": "yay -Qu",
+   "every": 100
 }
