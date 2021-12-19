@@ -74,6 +74,10 @@ module.exports = function (config, host, commands, notification_callback, callba
             });
           }else{
             console.log('Skipping command: ' + check_command.command_name);
+
+            i++;
+            loop_count++;
+            loop();
           }
         }
       }
