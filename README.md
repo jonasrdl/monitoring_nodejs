@@ -14,6 +14,68 @@ run ```npm install```
 
 run ```npm start```  
 
+# hosts
+
+```
+{
+   "name":"lucaspape.de",
+   "notify": [
+     {
+       "how": "email",
+       "vars": {
+         "email": "admin@lucaspape.de"
+       }
+     },
+     {
+       "how": "influx"
+     },
+     {
+       "how": "webhook",
+       "vars": {
+         "endpoint": "http://webhook.lucaspape.de/message"
+       }
+     }
+   ],
+   "check_commands":[
+      {
+         "command_name": "check_http",
+         "unique_name": "check_http_lucaspape",
+         "vars":{
+            "web_url":"https://lucaspape.de"
+         }
+      },
+      {
+         "command_name":"check_alive_ip4",
+         "vars":{
+            "ip4":"1.1.1.1"
+         }
+      }
+   ]
+}
+```
+
+Every host must have a unique ```name```, a ```notify``` array and a ```check_commands``` array.  
+
+The ```notify``` array contains methods on how to notify the user. Every object in the array must have a ```how``` (currently ```email```, ```influx``` or ```webhook```) and optionally an extra ```vars``` array.   
+```email``` and ```webhook``` will be called only on errors and warnings whereas everything will be saved in ```influx```.   
+A ```post``` request will be sent to the ```webhook``` ```endpoint``` including the message in the body.   
+
+The ```check_commands``` array contains the commands that will be run to check system health.  
+Every command must have a ```command_name```, this must be the same as the command ```name``` declared in the command.  
+Optionally it can have a ```vars``` object for variables.  
+Optionally ```unique_name``` can be used, if missing it will be generated from the ```vars``` array or random. If you have passwords or other important information in ```vars``` you should specify ```unique_name``` because it is shown in notifications.  
+
+# config
+
+```reoccurring_error_message_time```: time between two error messages (that resulted from the same command) in minutes  
+```reoccurring_warning_message_time```: time between two warning messages (that resulted from the same command) in minutes  
+```check_time```: time between batch of commands in seconds  
+```command_delay```: delay before running single command in seconds  
+```command_timeout```: timeout of single command in seconds  
+```validate_error```: retries if command returns error  
+```mail``` mail configuration  
+```ìnfluxdb``` influxdb configuration  
+
 # commands
 ```
 {
@@ -64,11 +126,11 @@ You can do the same thing with warnings:
    "warning_value": 0
 }
 ```
-  
+
 Available ```warning_on``` methods: same as ```error_on``` methods  
 
 ##
-  
+
 ```
 {
    "name":"check_diskspace_usage",
@@ -100,60 +162,6 @@ You can still use variables the same way.
 You can add a ```debug_command```, if an error occurs it will be run and the output included in the notification.  
 You can use the same vars like in ```command``` specified in ```required_vars```.  
 Instead of ```debug_command``` you can write ```debug_command_base64```.  
-
-# hosts
-
-```
-{
-   "name":"lucaspape.de",
-   "notify": [
-     {
-       "how": "email",
-       "vars": {
-         "email": "admin@lucaspape.de"
-       }
-     },
-     {
-       "how": "influx"
-     }
-   ],
-   "check_commands":[
-      {
-         "command_name": "check_http",
-         "unique_name": "check_http_lucaspape",
-         "vars":{
-            "web_url":"https://lucaspape.de"
-         }
-      },
-      {
-         "command_name":"check_alive_ip4",
-         "vars":{
-            "ip4":"1.1.1.1"
-         }
-      }
-   ]
-}
-```
-
-Every host must have a unique ```name```, a ```notify``` array and a ```check_commands``` array.  
-
-The ```notify``` array contains methods on how to notify the user. Every object in the array must have a ```how``` (currently ```email``` or ```influx```) and optionally an extra ```vars``` array.  
-
-The ```check_commands``` array contains the commands that will be run to check system health.  
-Every command must have a ```command_name```, this must be the same as the command ```name``` declared in the command.  
-Optionally it can have a ```vars``` object for variables.  
-Optionally ```unique_name``` can be used, if missing it will be generated from the ```vars``` array or random. If you have passwords or other important information in ```vars``` you should specify ```unique_name``` because it is shown in notifications.  
-
-# config
-
-```reoccurring_error_message_time```: time between two error messages (that resulted from the same command) in minutes  
-```reoccurring_warning_message_time```: time between two warning messages (that resulted from the same command) in minutes  
-```check_time```: time between batch of commands in seconds  
-```command_delay```: delay before running single command in seconds  
-```command_timeout```: timeout of single command in seconds  
-```validate_error```: retries if command returns error  
-```mail``` mail configuration  
-```ìnfluxdb``` influxdb configuration  
 
 # todo
 - check if process is running command
