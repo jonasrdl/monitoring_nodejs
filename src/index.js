@@ -32,7 +32,7 @@ if(validate_config()){
 
     fs.readdir(host_dir, (err, files) => {
       files.forEach(file => {
-        var host = JSON.parse(fs.readFileSync(host_dir + '/' + file));
+        var host = require('./' + host_dir + '/' + file);
 
         if(validate_host(host)){
           host.check_commands.forEach((command, i) => {
@@ -126,7 +126,7 @@ if(validate_config()){
 
                   if(ran >= todo){
                     ran = -1;
-                    
+
                     loop();
                   }
                 });
