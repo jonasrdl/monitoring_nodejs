@@ -47,8 +47,8 @@ if(!fs.existsSync('config.json')){
 }
 
 function mainSetup(){
-  mailAvailable = config.mail.host !== undefined;
-  influxAvailable = config.influxdb.hostname !== undefined;
+  mailAvailable = config.mail.host !== undefined || config.mail.service !== undefined;
+  influxAvailable = config.influxdb.host !== undefined;
 
   rl.question('Do you want to set up a new host? (y/n) ', (response) => {
     if(response === "y"){
@@ -232,10 +232,10 @@ function remoteSetup(callback){
     rl.question('SSH port ', (port) => {
       vars.port = port;
 
-      rl.question('SSH username', (username) => {
+      rl.question('SSH username ', (username) => {
         vars.username = username;
 
-        rl.question('SSH private key filepath', (filepath) => {
+        rl.question('SSH private key filepath ', (filepath) => {
           vars.privateKeyPath = filepath;
 
           callback(vars);
