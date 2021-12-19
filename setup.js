@@ -31,7 +31,7 @@ if(!fs.existsSync('config.json')){
     influxSetup((influxConfig) => {
       config.influxdb = influxConfig;
 
-      fs.writeFileSync('config.json', JSON.stringify(config));
+      fs.writeFileSync('config.json', JSON.stringify(config, null, 4));
 
       console.log('Wrote config.json');
 
@@ -53,7 +53,7 @@ function mainSetup(){
   rl.question('Do you want to set up a new host? (y/n) ', (response) => {
     if(response === "y"){
       hostSetup((host) => {
-        fs.writeFileSync('hosts/' + host.name + '.json', JSON.stringify(host));
+        fs.writeFileSync('hosts/' + host.name + '.json', JSON.stringify(host, null, 4));
 
         console.log('Wrote ' + 'hosts/' + host.name + '.json');
 
