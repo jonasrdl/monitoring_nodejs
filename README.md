@@ -60,6 +60,8 @@ The ```notify``` array contains methods on how to notify the user. Every object 
 ```email``` and ```webhook``` will be called only on errors and warnings whereas everything will be saved in ```influx```.   
 A ```post``` request will be sent to the ```webhook``` ```endpoint``` including the message in the body.   
 
+Warning: this project only works with influxdb version 1.8.9. Im not sure what the changes are with influx 2.0 and I dont care.   
+
 The ```check_commands``` array contains the commands that will be run to check system health.  
 Every command must have a ```command_name```, this must be the same as the command ```name``` declared in the command.  
 Optionally it can have a ```vars``` object for variables.  
