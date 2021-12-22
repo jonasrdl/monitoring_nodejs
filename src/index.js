@@ -18,22 +18,22 @@ if(validate_config()){
   console.log('Config validated!');
 
   fs.readdir(command_dir, (err, files) => {
-    var commands = {};
+    let commands = {};
 
     files.filter(file => { return path.extname(file).toLowerCase() === '.json' }).forEach(file => {
-      var command = JSON.parse(fs.readFileSync(command_dir + '/' + file));
+      let command = JSON.parse(fs.readFileSync(command_dir + '/' + file));
 
       commands[command.name] = command;
     });
 
     console.log('Loaded commands');
 
-    var hosts = [];
-    var hosts_map = new Map();
+    let hosts = [];
+    let hosts_map = new Map();
 
     fs.readdir(host_dir, (err, files) => {
       files.filter(file => { return path.extname(file).toLowerCase() === '.json' }).forEach(file => {
-        var host = JSON.parse(fs.readFileSync(host_dir + file));
+        let host = JSON.parse(fs.readFileSync(host_dir + file));
 
         if(validate_host(host)){
           host.check_commands.forEach((command, i) => {
@@ -88,7 +88,7 @@ if(validate_config()){
 
       console.log('Loaded hosts');
 
-      var loop = function(){
+      let loop = function(){
         //SEND OUT NOTIFICATIONS
         notification_thread.thread(()=>{
           console.log('Sent notifications!');
@@ -147,7 +147,7 @@ if(validate_config()){
 }
 
 function generate_unique_name(command){
-  var unique_name = command.command_name;
+  let unique_name = command.command_name;
 
   if(command.vars && Object.keys(command.vars).length > 0){
     Object.keys(command.vars).forEach((key) => {

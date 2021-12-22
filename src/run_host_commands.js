@@ -5,16 +5,16 @@ let run_count = 0;
 module.exports = function (config, host, commands, notification_callback, callback, reconnect_callback){
   run_count++;
 
-  var i = 0;
+  let i = 0;
 
-  var loop = function(){
+  let loop = function(){
     if(i < host.check_commands.length){
-      var check_command = host.check_commands[i];
+      let check_command = host.check_commands[i];
 
       if(!commands[check_command.command_name]){
         console.log('[' + host.name + ']' + ' Could not find command: ' + check_command.command_name);
       }else{
-        var command = commands[check_command.command_name];
+        let command = commands[check_command.command_name];
 
         command = parse_base64_command(command);
 
@@ -30,7 +30,7 @@ module.exports = function (config, host, commands, notification_callback, callba
             console.log('[' + host.name + ']' + ' Running command: ' + check_command.command_name);
 
             exec_command(host, command.command, config.command_delay, config.validate_error, config.command_timeout, (result) => {
-              var error_or_warning = {};
+              let error_or_warning = {};
 
               if(result.error){
                 error_or_warning = { state: 'error', message: 'error:\n\n' + result.error + '\nstdout:\n\n' + result.stdout};
@@ -49,7 +49,7 @@ module.exports = function (config, host, commands, notification_callback, callba
                 }
               }
 
-              var debug_command_callback = function(){
+              let debug_command_callback = function(){
                 if(command.multiple_lines_multiple_notifications){
                   //send a notification for every line of stdout
                   parse_multiline_stdout(host, check_command, result.stdout, error_or_warning, notification_callback);
@@ -89,7 +89,7 @@ module.exports = function (config, host, commands, notification_callback, callba
 }
 
 function parse_required_vars_command(command, check_command){
-  var has_required_vars = true;
+  let has_required_vars = true;
 
   command.required_vars.forEach((required_var) => {
     if(!check_command.vars[required_var]){
@@ -111,12 +111,12 @@ function parse_required_vars_command(command, check_command){
 }
 
 function parse_multiline_stdout(host, check_command, stdout, error_or_warning, notification_callback){
-  var k = 0;
-  var lines = stdout.split('\n');
+  let k = 0;
+  let lines = stdout.split('\n');
 
   lines.forEach((line) => {
     if(line){
-      var modified_check_command = JSON.parse(JSON.stringify(check_command));
+      let modified_check_command = JSON.parse(JSON.stringify(check_command));
       modified_check_command.unique_name = check_command.unique_name + '-' + k;
 
       notification_callback(host, modified_check_command, error_or_warning.state, error_or_warning.message, line);
@@ -152,13 +152,13 @@ function exec_command(host, command, command_delay, runs, timeout, callback, rec
 
 function exec_command_local(command, command_delay, runs, timeout, callback){
   setTimeout(()=>{
-    var i = 0;
+    let i = 0;
 
-    var lastError = '';
-    var lastStderr = '';
-    var lastStdout = '';
+    let lastError = '';
+    let lastStderr = '';
+    let lastStdout = '';
 
-    var command_callback = function(){
+    let command_callback = function(){
       if(i < runs){
         exec('timeout ' + timeout + ' ' + command, (error, stdout, stderr) => {
           if(error || stderr){
@@ -186,13 +186,13 @@ function exec_command_local(command, command_delay, runs, timeout, callback){
 
 function exec_command_ssh(host, command, command_delay, runs, timeout, callback, reconnect_callback){
   setTimeout(()=>{
-    var i = 0;
+    let i = 0;
 
-    var lastError = '';
-    var lastStderr = '';
-    var lastStdout = '';
+    let lastError = '';
+    let lastStderr = '';
+    let lastStdout = '';
 
-    var command_callback = function(){
+    let command_callback = function(){
       if(i < runs){
         host.ssh.execCommand('timeout ' + timeout + ' ' + command).then((result) => {
           let error = '';
