@@ -9,7 +9,7 @@ module.exports = function (config, notify, host, check_command, state, message, 
 
         mail_messages[host.name][check_command.unique_name].lastOccurring = Date.now();
 
-        if(((Date.now() - mail_messages[host.name][check_command.unique_name].lastNotification) >= 60000*config.reoccurring_error_message_time && state == 'error') || ((Date.now() - mail_messages[host.name][check_command.unique_name].lastNotification) >= 60000*config.reoccurring_warning_message_time && state == 'warning') || mail_messages[host.name][check_command.unique_name].lastState !== state){
+        if(((Date.now() - mail_messages[host.name][check_command.unique_name].lastNotification) >= 60000*config.reoccurring_error_message_time && state === 'error') || ((Date.now() - mail_messages[host.name][check_command.unique_name].lastNotification) >= 60000*config.reoccurring_warning_message_time && state === 'warning') || mail_messages[host.name][check_command.unique_name].lastState !== state){
           mail_messages[host.name][check_command.unique_name].lastNotification = Date.now();
 
           send_email(config, notify, host, check_command, 'REOCCURRING', state, message, mail_messages[host.name][check_command.unique_name], ()=>{
@@ -40,16 +40,16 @@ module.exports = function (config, notify, host, check_command, state, message, 
   }
 }
 
-var transporter = undefined;
+let transporter = undefined;
 
 function send_email(config, notify, host, check_command, type, state, message, timestamps, callback){
   if(!transporter){
     transporter = nodemailer.createTransport(config.mail);
   }
 
-  var timestampText = 'First occurred: ' + timeConverter(timestamps.firstOccurring) + '\nLast occurred: ' + timeConverter(timestamps.lastOccurring);
-  var subject = '[' + type + '] ' + state + ' while checking command ' + check_command.command_name;
-  var text = '';
+  let timestampText = 'First occurred: ' + timeConverter(timestamps.firstOccurring) + '\nLast occurred: ' + timeConverter(timestamps.lastOccurring);
+  let subject = '[' + type + '] ' + state + ' while checking command ' + check_command.command_name;
+  let text = '';
 
   if(message){
     text = check_command.unique_name + ' returned ' + state + ' on ' + host.name + '\n \n' + message + '\n' + timestampText;
@@ -74,14 +74,14 @@ function send_email(config, notify, host, check_command, type, state, message, t
 }
 
 function timeConverter(UNIX_timestamp){
-  var a = new Date(UNIX_timestamp);
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var year = a.getFullYear();
-  var month = months[a.getMonth()];
-  var date = a.getDate();
-  var hour = a.getHours();
-  var min = a.getMinutes();
-  var sec = a.getSeconds();
-  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
-  return time;
+  let a = new Date(UNIX_timestamp);
+  let months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let year = a.getFullYear();
+  let month = months[a.getMonth()];
+  let date = a.getDate();
+  let hour = a.getHours();
+  let min = a.getMinutes();
+  let sec = a.getSeconds();
+
+  return date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
 }
