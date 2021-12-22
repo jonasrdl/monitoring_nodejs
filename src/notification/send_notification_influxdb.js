@@ -1,7 +1,7 @@
 const Influx = require('influx');
 
 module.exports = function(config, notify, host, check_command, state, message, stdout, callback){
-  var influxdb = new Influx.InfluxDB({host: config.influxdb.host, database: config.influxdb.database, username: config.influxdb.username, password: config.influxdb.password,
+  let influxdb = new Influx.InfluxDB({host: config.influxdb.host, database: config.influxdb.database, username: config.influxdb.username, password: config.influxdb.password,
     schema: [
       {
         measurement: check_command.command_name,
@@ -19,7 +19,7 @@ module.exports = function(config, notify, host, check_command, state, message, s
     ]
   });
 
-  var out_float = 0.0;
+  let out_float = 0.0;
 
   out_float = parseFloat(stdout);
 

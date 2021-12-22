@@ -2,11 +2,11 @@ const send_notification_email = require('./send_notification_email.js');
 const send_notification_influxdb = require('./send_notification_influxdb.js');
 const send_notification_webhook = require('./send_notification_webhook.js');
 
-var queue = {};
-var index = {};
+let queue = {};
+let index = {};
 
 module.exports.thread = function(callback){
-  var loop = function(){
+  let loop = function(){
     if(queue.influx.length>index.influx || queue.email.length>index.email || queue.webhook.length>index.webhook){
       let current_email = queue.email[index.email];
       let current_influx = queue.influx[index.influx];
