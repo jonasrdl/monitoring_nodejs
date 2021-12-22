@@ -47,7 +47,7 @@ function send_email(config, notify, host, check_command, type, state, message, t
     transporter = nodemailer.createTransport(config.mail);
   }
 
-  var timestampText = 'First occurred: ' + timeConverter(timestamps.firstOccurring) + '\n Last occurred: ' + timeConverter(timestamps.lastOccurring);
+  var timestampText = 'First occurred: ' + timeConverter(timestamps.firstOccurring) + '\nLast occurred: ' + timeConverter(timestamps.lastOccurring);
   var subject = '[' + type + '] ' + state + ' while checking command ' + check_command.command_name;
   var text = '';
 
